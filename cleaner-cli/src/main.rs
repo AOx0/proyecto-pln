@@ -7,7 +7,25 @@ use cleaner_lib::{
     lexer::{Lexer, Section},
 };
 use itertools::{izip, Itertools};
-use tokio::io::AsyncReadExt;
+
+fn get_limit() -> usize {
+    if cfg!(unix) {
+        use libc::{getrlimit, rlimit, RLIMIT_NOFILE};
+
+        let mut rlim = rlimit {
+            rlim_cur: 0,
+            rlim_max: 0,
+        };
+
+        unsafe {
+            if getrlimit(RLIMIT_NOFILE, &mut rlim) == 0 {
+                return rlim.rlim_cur.try_into().unwrap_or(usize::MAX);
+            }
+        }
+    }
+
+    1024
+}
 
 #[tokio::main]
 async fn main() -> std::process::ExitCode {
@@ -15,7 +33,6 @@ async fn main() -> std::process::ExitCode {
         path,
         open,
         close,
-        max_open_files,
         single_line,
     } = args::Args::parse();
 
@@ -34,7 +51,9 @@ async fn main() -> std::process::ExitCode {
         .map(|d| Delimiter::from(d.as_str().trim_matches('\'')))
         .collect_vec();
 
-    let semaphore = tokio::sync::Semaphore::new(max_open_files);
+    let limit = get_limit();
+    info!("Using soft open limit of {limit}");
+    let semaphore = tokio::sync::Semaphore::new(limit - 100);
 
     let rep_multi = std::sync::atomic::AtomicUsize::new(0);
     let rep_single = std::sync::atomic::AtomicUsize::new(0);
@@ -48,7 +67,7 @@ async fn main() -> std::process::ExitCode {
     };
 
     async_scoped::TokioScope::scope_and_block(|s| {
-        for entry in walkdir::WalkDir::new(path).max_open(10).into_iter() {
+        for entry in walkdir::WalkDir::new(path).max_open(80).into_iter() {
             let res = || async {
                 let guard = semaphore.acquire().await;
 
@@ -66,24 +85,13 @@ async fn main() -> std::process::ExitCode {
 
                 num_files.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
 
-                let file = tokio::fs::OpenOptions::new()
-                    .read(true)
-                    .create(false)
-                    .open(entry.path())
-                    .await;
-
-                let mut file = match file {
-                    Ok(file) => file,
+                let read_res = tokio::fs::read(entry.path()).await;
+                let contents = match read_res {
                     Err(err) => {
-                        warn!("Error with entry {:?}: {:?}", entry.path().display(), err);
+                        warn!("Error reading {:?}: {:?}", entry.path().display(), err);
                         return std::process::ExitCode::SUCCESS;
                     }
-                };
-
-                let mut contents = Vec::new();
-                if let Err(err) = file.read_to_end(&mut contents).await {
-                    warn!("Error reading {:?}: {:?}", entry.path().display(), err);
-                    return std::process::ExitCode::SUCCESS;
+                    Ok(contents) => contents,
                 };
 
                 let lexer = Lexer::new(&contents, &multilines, &singleline).unwrap();

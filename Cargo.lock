@@ -195,6 +195,7 @@ dependencies = [
  "clap",
  "cleaner-lib",
  "itertools",
+ "libc",
  "logos",
  "owo-colors",
  "tokio",
