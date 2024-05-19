@@ -1,3 +1,25 @@
+cargo-features = ["codegen-backend"]
 [workspace]
-members = []
+members = ["cleaner-cli", "cleaner-lib", "cleaner-py"]
 resolver = "2"
+
+[workspace.dependencies]
+anyhow = "1.0.83"
+async-scoped = { version = "0.9.0", features = ["tokio", "use-tokio"] }
+bstr = "1.9.1"
+clap = { version = "4.5.4", features = ["derive"] }
+itertools = "0.12.1"
+logos = "0.14.0"
+owo-colors = { version = "4.0.0", features = ["supports-colors"] }
+tokio = { version = "1.37.0", features = ["full"] }
+walkdir = "2.5.0"
+
+[profile.dev]
+debug = 0
+codegen-backend = "cranelift"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+

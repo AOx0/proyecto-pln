@@ -1,0 +1,22 @@
+cargo-features = ["codegen-backend"]
+
+[package]
+name = "cleaner-cli"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "cleaner"
+path = "src/main.rs"
+
+[dependencies]
+cleaner-lib = { path = "../cleaner-lib" }
+anyhow.workspace = true
+async-scoped.workspace = true
+bstr.workspace = true
+clap.workspace = true
+itertools.workspace = true
+logos.workspace = true
+owo-colors.workspace = true
+tokio.workspace = true
+walkdir.workspace = true

@@ -1,0 +1,11 @@
+[package]
+name = "cleaner-lib"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow.workspace = true
+bstr.workspace = true
+itertools.workspace = true
+logos.workspace = true
+tokio.workspace = true
