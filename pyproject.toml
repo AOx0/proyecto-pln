@@ -5,7 +5,10 @@ description = "Add your description here"
 authors = [
     { name = "Alejandro Osornio", email = "aoxo.contact@gmail.com" }
 ]
-dependencies = []
+dependencies = [
+    "pip>=24.0",
+    "streamlit>=1.34.0",
+]
 readme = "README.md"
 requires-python = ">= 3.8"
 
