@@ -44,12 +44,6 @@ LANGS = [
     ("YAML", [], ["#"]),
 ]
 
-faulty = "/home/ae/repos/archivos/dataset/Dart/023343.dart"
-if os.path.exists(faulty):
-    print(f"Removing {faulty}")
-    os.remove(faulty)
-
-
 for lang, multi, single in LANGS:
     command = ["cleaner", f"/home/ae/repos/archivos/dataset2/{lang}"]
     for open, close in multi:
