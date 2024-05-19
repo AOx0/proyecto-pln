@@ -1,19 +1,12 @@
-use bstr::{BStr, ByteSlice, ByteVec};
+use bstr::BStr;
 use cleaner_lib::{
     delimit::{Delimiter, Multiline},
     lexer::Section,
 };
-use pyo3::{prelude::*, types::PyBytes};
+use pyo3::prelude::*;
 
-#[allow(dead_code)]
 type Singles = Vec<&'static str>;
-#[allow(dead_code)]
 type Multis = Vec<(&'static str, &'static str)>;
-
-#[allow(dead_code)]
-type SinglesBytes = Vec<PyObject>;
-#[allow(dead_code)]
-type MultisBytes = Vec<(PyObject, PyObject)>;
 
 #[pyfunction]
 fn lang(lang: &str) -> PyResult<Option<(Multis, Singles)>> {
@@ -64,36 +57,7 @@ fn lang(lang: &str) -> PyResult<Option<(Multis, Singles)>> {
 }
 
 #[pyfunction]
-fn lang_bytes(py: Python, lng: &str) -> PyResult<Option<(MultisBytes, SinglesBytes)>> {
-    let val = lang(lng);
-
-    let (multis, singles) = match val {
-        Ok(Some((multis, singles))) => (multis, singles),
-        Ok(None) => return Ok(None),
-        Err(err) => return Err(err),
-    };
-
-    let multis = multis
-        .into_iter()
-        .map(|(a, b)| {
-            (
-                PyBytes::new(py, a.as_bytes()).into(),
-                PyBytes::new(py, b.as_bytes()).into(),
-            )
-        })
-        .collect();
-
-    let singles = singles
-        .into_iter()
-        .map(|a| PyBytes::new(py, a.as_bytes()).into())
-        .collect();
-
-    Ok(Some((multis, singles)))
-}
-
-/// Clean the comments
-#[pyfunction]
-fn clean_string(
+fn string(
     s: &str,
     multi: Option<Vec<(&str, &str)>>,
     single: Option<Vec<&str>>,
@@ -137,59 +101,10 @@ fn clean_string(
     Ok(res)
 }
 
-#[pyfunction]
-fn clean_bytes(
-    py: Python,
-    s: &[u8],
-    multi: Option<Vec<(&[u8], &[u8])>>,
-    single: Option<Vec<&[u8]>>,
-) -> PyResult<PyObject> {
-    let multis = multi.unwrap_or_default();
-    let multis: Vec<Multiline> = {
-        multis
-            .iter()
-            .map(|(o, c)| Multiline::new(o, c).unwrap())
-            .collect()
-    };
-
-    let singles = single.unwrap_or_default();
-    let singles: Vec<Delimiter> = {
-        singles
-            .iter()
-            .copied()
-            .map(|s| Delimiter(s.as_bstr()))
-            .collect()
-    };
-
-    if multis.is_empty() && singles.is_empty() {
-        return Ok(pyo3::types::PyBytes::new(py, s).into());
-    }
-
-    let contents = BStr::new(s.as_bytes());
-    let lexer = cleaner_lib::lexer::Lexer::new(contents, &multis, &singles).unwrap();
-
-    let iter_clean = lexer.into_iter().filter_map(|e| match e {
-        Section::Raw(str) => Some(std::borrow::Cow::Borrowed(str)),
-        Section::DelimOpen(_) => None,
-        Section::DelimSingle(_) => None,
-        Section::DelimClose(_) => None,
-    });
-
-    let mut res = Vec::with_capacity(s.len());
-
-    for clean in iter_clean {
-        res.push_str(clean.as_bstr())
-    }
-
-    Ok(pyo3::types::PyBytes::new(py, &res).into())
-}
-
 /// A Python module implemented in Rust.
 #[pymodule]
-fn ccleaner(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(clean_string, m)?)?;
-    m.add_function(wrap_pyfunction!(clean_bytes, m)?)?;
+fn _cleaner(_py: Python, m: &PyModule) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(string, m)?)?;
     m.add_function(wrap_pyfunction!(lang, m)?)?;
-    m.add_function(wrap_pyfunction!(lang_bytes, m)?)?;
     Ok(())
 }

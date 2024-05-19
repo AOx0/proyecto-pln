@@ -1,8 +1,12 @@
 install-cleaner:
-    cd cleaner-py && VIRTUAL_ENV='{{justfile_directory()}}/.venv/' maturin develop --release
+    cd cleaner-py && maturin build --release
+    find '{{justfile_directory()}}/target/' -name '*.whl' | xargs -I {} rye add cleaner --absolute --path '{}'
+
+uninstall-cleaner:
+    rye remove cleaner
 
 install-kernel:
-    python -m ipykernel install --user --name=proyecto-pln
+    env PATH="{{justfile_directory()}}/.venv/lib/python3.12/site-packages:$PATH" ./.venv/bin/python -m ipykernel install --user --name=proyecto-pln
 
 uninstall-kernel:
     jupyter kernelspec remove proyecto-pln
