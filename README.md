@@ -2,11 +2,11 @@
 
 ## Dependencies
 
-This project uses [rye](rye), [just](just) and the Nightly Rust compiler via [rustup](rust).
+This project uses [rye], [just] and the Nightly Rust compiler via [rustup].
 
 ## Dataset
 
-The dataset the project uses is available [at kaggle](dataset). The models are trained using a cleaned up version from the sources of the dataset where all comments are removed per programming language.
+The dataset the project uses is available at [kaggle]. The models are trained using a cleaned up version from the sources of the dataset where all comments are removed per programming language.
 
 There are two strategies to clean the source codes:
   - For one *ahead-of-time* cleanup you can use the `cleaner` cli (available at `./cleaner-cli`) to clean all sources once before the processing and training.
@@ -37,5 +37,5 @@ cleaner lua_files/ --open "'--[['" --close "'--]]'" --single-line "'--'"
 
 [rye]: https://github.com/astral-sh/rye
 [just]: https://github.com/casey/just
-[rust]: https://www.rust-lang.org/tools/install
-[dataset]: https://www.kaggle.com/datasets/joonasyoon/file-format-detection
+[rustup]: https://www.rust-lang.org/tools/install
+[kaggle]: https://www.kaggle.com/datasets/joonasyoon/file-format-detection
