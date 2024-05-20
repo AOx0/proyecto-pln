@@ -49,7 +49,7 @@ cleaner ruby_files/ --open "=begin" --close "=end" --single-line "#"
 cleaner lua_files/ --open "'--[['" --close "'--]]'" --single-line "'--'"
 ```
 
-There's a script to automatically clean all top langs (+100k lines of code) at `notebooks/clean.py`. Just make sure to change de hardcoded path to the directory of source files that was downloaded from [kaggle].
+There's a script to automatically clean all top langs (+100k lines of code) at `scripts/clean_comments.py`. Just make sure to change the hardcoded path to the directory of source files that was downloaded from [kaggle].
 ```sh
 python scripts/clean_comments.py
 ```

@@ -11,6 +11,9 @@ dependencies = [
     "ipykernel>=6.29.4",
     "cleaner @ file:///home/ae/repos/proyecto-pln/target/wheels/cleaner-0.1.0-cp312-cp312-manylinux_2_34_x86_64.whl",
     "msgpack>=1.0.8",
+    "scikit-learn>=1.4.2",
+    "plotly-express>=0.4.1",
+    "nbformat>=5.10.4",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
