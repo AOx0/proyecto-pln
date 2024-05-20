@@ -1,0 +1,10 @@
+dataset:
+  type: web
+  title: "Programming Laungages and File Format Detection"
+  url: "https://www.kaggle.com/datasets/joonasyoon/file-format-detection"
+
+lookahead:
+  title: "Parsing"
+  date: 2024-05-20
+  type: Article
+  url: "https://en.wikipedia.org/w/index.php?title=Parsing&oldid=1220469833#Lookahead"
