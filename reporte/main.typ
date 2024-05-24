@@ -12,22 +12,22 @@
 
 #let TODO(msg) = {[]}
 
-= Introducción
+= Introduction
 
-== Objetivo
+== Objective
 
-== Metodología
+== Methodology
 
 
 = Entrega
 
-Le entregamos un repositorio de código _hosteado_ en GitHub con todo el código generado para el proyecto, así como con los recursos resultantes como son imágenes, documentos PDF, embeddings y modelos.
+All the code, and its results are hosted on GitHub, this includes embeddings, images, models and test/research Jupyter Notebooks and Python scripts.
 
-La liga con el código fuente es:
+The repository with the source code can be founda at the URL:
 
 #text(font: "JetBrainsMono NFM", size: 9pt, weight: 900, [#h(1cm) https://github.com/AOx0/proyecto-pln])
 
-La estructura de los archivos de código incluidos es la que se describe en la siguiente tabla:
+The file structure the repository has is:
 
 #tablex(
   columns: (2.6cm, 1fr),
@@ -38,82 +38,92 @@ La estructura de los archivos de código incluidos es la que se describe en la s
     it
   },
   stroke: gray + 0pt,
-  [*Carpeta*], [*Función*],
-  [`cleaner-lib/`], [Incluye la implementación de un _parser_ que puede encontrar bloques de comentarios de una sola línea y multilínea con soporte para _lookahead_ sin límite @lookahead.],
-  [`cleaner-cli/`], [Incluye la implementación de una herramienta de la line de comandos para hacer una limpieza anticipada de los datos (ver la #TODO("Agregar sección de limpieza anticipada"))],
-  [`cleaner-py/`], [Incluye la implementación de una librería de Python con _bindings_ para usar la librería de limpieza de comentarios.],
-  [`embeddings/`], [Contiene _pickles_ con los _embeddings_ generados para el entrenamiento y pruebas.],
-  [`notebooks/`], [Contiene todos los _notebooks_ empleados para limpieza, experimentación, y respaldo de información mencionada en el resto del documento.],
-  [`reporte/`], [Contiene el código de Typst #TODO("Mencionar Typst") para generar el PDF del reporte final.],
-  [`resources/`], [Contiene recursos extras empleados por streamlit #TODO("Verificar si vale la pena moverlo a streamlit")],
-  [`scripts/`], [Contiene _scripts_ empleados para la limpieza de los datos de forma anticipada (ver la #TODO("Mencionar seccion de limpieza anticipada")).],
-  [`streamlit/`], [Incluye la implementación de la página WEB mostrada en la presentación del proyecto realizada con Streamlit.],
+  [*Folder*], [*Description*],
+  [`cleaner-lib/`], [Includes a parser implementation with arbitrary _lookahead_ @lookahead that can identify multi and single line comment blocks, this is useful to give the comments in the source code a special treatment/processing],
+  [`cleaner-cli/`], [Implementation of a basic CLI tool to clean all comments from the dataset ahead-of-time (see #TODO("Agregar sección de limpieza anticipada"))],
+  [`cleaner-py/`], [Python binds for the `cleaner-lib` implementation, allowing us to clean user-input from the Python runtime],
+  [`embeddings/`], [Folder with all _pickle_ files with embeddings used to train models],
+  [`notebooks/`], [Folder with all Jupyter Notebooks for model training, embedding generation and research],
+  [`reporte/`], [The Typst #TODO("Mencionar Typst") source code for the project's report (this document)],
+  [`resources/`], [Contains _streamlit_ assests like charts and images #TODO("Verificar si vale la pena moverlo a streamlit")],
+  [`scripts/`], [Various scripts for embedding generation, data cleanup and alike. (ver la #TODO("Mencionar seccion de limpieza anticipada"))],
+  [`streamlit/`], [Source code for the streamlit WEB page displayed at the project's presentation],
 )
 
 = Dataset
 
-== Estructura del Dataset
+== The dataset's structure
 
-El dataset obtenido de Kaggle @dataset contiene 86,227 archivos de código dentro de un directorio con 77 lenguajes de programación y un CSV que describe la ubicación, tipo de lenguaje e información extra como tamaño del archivo y líneas de código.
+The dataset from Kaggle @dataset contains 86,227 source code files inside a directory with 77 programming languages and a CSV file that describes location, programming language and metadata like number of lines of code, or file size.
 
 ```py
 .
-├── sources.json    # Contiene las fuentes donde se obtuvieron los archivos.
-├── dataset.csv     # Contiene la información de todos los archivos.
-└── dataset/        # Un folder con carpetas para cada lenguaje de programación.
+├── sources.json    # Contains the sources with a JSON format where source code was gathered
+├── dataset.csv     # Contains information for all source code files in a CSV format
+└── dataset/        # Top-folder with subdirectories for each programming language
 	├── AppleScript/  
-	├── AsciiDoc/     # Cada carpeta contiene archivos con código correspondiente 
-	├── Assembly/     # ... al lenguaje de programación de la carpeta.
+	├── AsciiDoc/     # Each directory contains source code that corresponds to the name 
+	├── Assembly/     # ... of the folder.
 	├── ...
 	├── XSLT/
 	├── Yacc/
 	└── YAML/
 ```
 
-== Campos de `dataset.csv`
+== `dataset.csv` fields
 
-En la siguiente tabla se listan los campos que contiene el archivo `dataset.csv`, se incluyen comentarios preliminares sobre la importancia del campo y consideraciones para el resto del escrito.
+The following table contains the fields of the CSV file `dataset.csv`, each field has a description and prelimnary comments about its usefulness and future considerations.
 
 #table(
   columns: (auto, 1fr),
   stroke: 0pt,
-  [*Campo*], [*Descripción*],
-  [`id`], [Un identificador único por entrada. No aporta información relevante y por eso lo eliminamos del _dataframe_ en la sección de limpieza #TODO("Agregar referencia").],
-  [`file_path`], [La ruta en el directorio `dataset` donde está ubicado el archivo. La ruta en sí no nos es de utilidad, así que se usa para leer los contenidos y después se elimina en el preprocesamiento y limpieza (ver la #TODO("Referencia a eliminación de cosas extra"))],
-  [`file_size`], [El tamaño del archivo en bytes. No aporta a la información relevante y por eso lo eliminamos del _dataframe_ en la sección de limpieza #TODO("Agregar referencia").],
-  [`line_count`], [El número de líneas de código que contiene el archivo. El número, junto con el tamaño del archivo se vuelven irrelevantes al limpiar los archivos de código en la sección de limpieza #TODO("Agregar referencia")],
-  [`extension`], [La extensión del archivo que contiene el código. Como nos basaremos enteramente en el corpus del documento para la predicción, la extensión es irrelevante y la eliminamos en la fase de limpieza de los datos #TODO("Agregar referencia").],
-  [`language`], [La etiqueta que indica el lenguaje de programación que se usa en el archivo.],
+  [*Field*], [*Description*],
+  [`id`], [A unique identifier per entry, this information does not provide any value to the training process, hence we delete it in the cleanup phase @cleanup],
+  [`file_path`], [The path where the source code can be found for the CSV entry, during the preprocessing phase we read the contents from the path and eliminate the path since itself does not provide value to the training of the models @cleanup],
+  [`file_size`], [The source file size in bytes. The size of the file does not matter but the contents, hence we delete this information on the cleanup phase @cleanup],
+  [`line_count`], [The number of lines of source code the file contains. During cleanup @cleanup we modify the number of lines, this field becomes irrelevant],
+  [`extension`], [The file extension the path has, this is redundant since the `language` field can be used as a label for the language type. We delete this field in the cleanup phase @cleanup],
+  [`language`], [The name of the programming language the entry refers to, this is the field we use as `label` for training],
 )
 
-== Preprocesamiento
+== Preprocessing
 
-=== Limpieza
+=== Cleanup <cleanup>
 
-Existen dos estrategias de limpieza utilizadas a lo largo del programa. Una limpieza anticipada de todos los archivos de código, que permite tener código fuente limpio desde el inicio y no tener que repetir el procedimiento en cada modelo (p. ej. en cada notebook) y la funcionalidad necesaria para limpiar entrada de usuario por demanda.
+There are two times when the source code is cleaned up, one ahead-of-time to clean all training source code files once before training and then each time we have new user input to classify. The same process is applied to the two cleanup stages #TODO("Stages??").
 
-Ambas estrategias realizan las mismas operaciones en tiempos distintos, y con herramientas distintas:
-+ Eliminar los comentarios (ver la @eliminar_comentarios para la justificación)
-+ Eliminar saltos de línea 
+- Clean all multi-line and single-line comments from the source code.
+- Eliminate unnecessary spaces and tabulations.
 
-==== Limpieza anticipada
+==== #TODO("Title?")
 
-La idea de la limpieza anticipada es procesar el código contenido en los 86 mil archivos de código una sola vez, así evitamos tener que realizar el procedimiento repetidas veces para los distintos ejercicios y experimentos con la base de información durante el proyecto.
+The main idea to pre-process all files once saves us from repeating the process for each trained model for the project, and skip to the embedding generation strategy, allowing us to iterate much faster #TODO("Jusitufy much faster") when doing experiments.
 
-La limpieza anticipada se realiza aprovechando ejecutables existentes para la línea de comandos que permiten realizar operaciones individuales sobre el conjunto de archivos.
+The once ahead-of-time cleanup uses a CLI tool that has the capacity to look for multi/single line comments and eliminate them from the source code with no pre-defined lookahead.
 
-==== Limpieza por demanda
+==== On-demmand cleanup #TODO("Title??")
 
-El objetivo de la limpieza por demanda es de proveer un mecanismo para realizar el mismo proceso de limpieza que se llevó a cabo en la limpieza anticipada para que se pueda emplear en nuevos datos, como es la entrada del usuario. Para este propósito se definen funciones en Python que realizan el mismo procedimiento por medio de librerías con funcionalidad análoga a los ejecutables empleados (p. ej. usar `re` para realizar la limpieza que hace `ruplacer`) o implementando librerías que permitan reusar la implementación de los ejecutables desde Python (p. ej. Python bindings para `cleaner-lib`).
-
-
-==== Eliminación de comentarios <eliminar_comentarios>
-
-
-
+We implement Python functions to perform the same cleanup stages the ahead-of-time does #TODO("Reference ahead-of-time"). This allows us to clean user input consistently with the pre-processing stage cleanup.
 
 == Embeddings
 
+=== BoW
+
+=== TF-IDF
+
+=== CodeBERT
+
+=== spaCy
+
+== Models
+
+=== SVM
+
+
+
+=== FNN
+
+=== RNN
 
 #show bibliography: set heading(numbering: "1")
 #bibliography("bib.yml")

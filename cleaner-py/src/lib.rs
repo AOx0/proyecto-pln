@@ -85,11 +85,11 @@ fn string(
     let contents = BStr::new(s.as_bytes());
     let lexer = cleaner_lib::lexer::Lexer::new(contents, &multis, &singles).unwrap();
 
-    let iter_clean = lexer.into_iter().filter_map(|e| match e {
-        Section::Raw(str) => Some(std::borrow::Cow::Borrowed(str)),
-        Section::DelimOpen(_) => None,
-        Section::DelimSingle(_) => None,
-        Section::DelimClose(_) => None,
+    let iter_clean = lexer.into_iter().map(|e| match e {
+        Section::Raw(str) => std::borrow::Cow::Borrowed(str),
+        Section::DelimOpen(delim) => std::borrow::Cow::Borrowed(delim),
+        Section::DelimSingle(delim) => std::borrow::Cow::Borrowed(delim),
+        Section::DelimClose(delim) => std::borrow::Cow::Borrowed(delim),
     });
 
     let mut res = String::with_capacity(s.len());

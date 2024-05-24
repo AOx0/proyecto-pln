@@ -19,6 +19,10 @@ dependencies = [
     "matplotlib>=3.9.0",
     "nltk>=3.8.1",
     "ipywidgets>=8.1.2",
+    "spacy>=3.7.4",
+    "en-core-web-lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.7.1/en_core_web_lg-3.7.1-py3-none-any.whl",
+    "seaborn>=0.13.2",
+    "tensorflow>=2.16.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
