@@ -23,6 +23,7 @@ dependencies = [
     "en-core-web-lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.7.1/en_core_web_lg-3.7.1-py3-none-any.whl",
     "seaborn>=0.13.2",
     "tensorflow>=2.16.1",
+    "contractions>=0.1.73",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"

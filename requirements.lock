@@ -16,6 +16,8 @@ altair==5.3.0
     # via streamlit
 annotated-types==0.7.0
     # via pydantic
+anyascii==0.3.2
+    # via textsearch
 asttokens==2.4.1
     # via stack-data
 astunparse==1.6.3
@@ -52,6 +54,7 @@ confection==0.1.4
     # via weasel
 contourpy==1.2.1
     # via matplotlib
+contractions==0.1.73
 cycler==0.12.1
     # via matplotlib
 cymem==2.0.8
@@ -275,6 +278,8 @@ ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.2
     # via stack-data
+pyahocorasick==2.1.0
+    # via textsearch
 pyarrow==16.1.0
     # via streamlit
 pydantic==2.7.1
@@ -377,6 +382,8 @@ tensorboard-data-server==0.7.2
 tensorflow==2.16.1
 termcolor==2.4.0
     # via tensorflow
+textsearch==0.0.24
+    # via contractions
 thinc==8.2.3
     # via spacy
 threadpoolctl==3.5.0
