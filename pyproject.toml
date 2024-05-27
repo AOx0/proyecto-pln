@@ -24,6 +24,7 @@ dependencies = [
     "seaborn>=0.13.2",
     "tensorflow>=2.16.1",
     "contractions>=0.1.73",
+    "wordcloud>=1.9.3",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"

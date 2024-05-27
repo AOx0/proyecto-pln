@@ -36,6 +36,8 @@ def clean_comments(contents, language) -> str:
 
 def clean_extras(contents) -> str:
     contents = re.sub(r"[\r]", "", contents)
+    contents = re.sub(r"'[^']*'", "''", contents)
+    contents = re.sub('"[^"]*"', '""', contents)
     contents = re.sub(r"\w{15,}", "", contents)
     contents = re.sub("[\n]{2,}", "\n", contents)
     contents = re.sub("[\t]{2,}", "\t", contents)
@@ -185,19 +187,34 @@ del df["line_count"]
 del df["extension"]
 
 
+print("Reading contents...")
 df["source"] = df["file_path"].progress_apply(
     lambda x: read_content(x, "/home/ae/repos/archivos/dataset")
 )
 
+mapper = {}
+for i in range(len(TARGET)):
+    mapper[TARGET[i]] = i
+
+print("Generating labels...")
+df["lang"] = df["language"].map(mapper)
+
+print("Cleaning contents...")
 df["source"] = df.progress_apply(lambda r: clean_comments(r.source, r.language), axis=1)
 
+print("Cleaning extras...")
 df["source"] = df["source"].progress_apply(clean_extras)
 
-df_chunk = gen_chunk_entries(df, 3000)
+chunks = 3000
+print(f"Splitting in {chunks} chunks for each language...")
+df_chunk = gen_chunk_entries(df, chunks)
 
+print("Tokenizing...")
 df_chunk["tokens"] = df_chunk["source"].progress_apply(tokenize)
 
 for i, df in enumerate(split_dataframe(df_chunk, 10)):
     df = df.copy()
+    print(f"Vectorizing chunk {i} ...")
     df["vector"] = df["tokens"].progress_apply(vectorize)
-    df.to_pickle(f"fbert_clean_3000x512_aprox_{i}")
+    print(f"Saving chunk {i} ...")
+    df.to_pickle(f"bert_clean_3000x512_aprox_{i}")

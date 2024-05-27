@@ -36,6 +36,8 @@ def clean_comments(contents, language) -> str:
 
 def clean_extras(contents) -> str:
     contents = re.sub(r"[\r]", "", contents)
+    contents = re.sub(r"'[^']*'", "''", contents)
+    contents = re.sub('"[^"]*"', '""', contents)
     contents = re.sub(r"\w{15,}", "", contents)
     contents = re.sub("[\n]{2,}", "\n", contents)
     contents = re.sub("[\t]{2,}", "\t", contents)
@@ -184,20 +186,37 @@ del df["file_size"]
 del df["line_count"]
 del df["extension"]
 
+print("Reading contents...")
 df["source"] = df["file_path"].progress_apply(
     lambda x: read_content(x, "/home/ae/repos/archivos/dataset")
 )
 
+mapper = {}
+for i in range(len(TARGET)):
+    mapper[TARGET[i]] = i
+
+print("Generating labels...")
+df["lang"] = df["language"].map(mapper)
+
 df_clean = df.copy()
 df_dirty = df.copy()
 
+print("Cleaning contents on df_clean...")
 df_clean["source"] = df_clean.progress_apply(lambda r: clean_comments(r.source, r.language), axis=1)
 
+
+print("Cleaning extras on df_clean...")
 df_clean["source"] = df_clean["source"].progress_apply(clean_extras)
+print("Cleaning extras on df_dirty...")
 df_dirty["source"] = df_dirty["source"].progress_apply(clean_extras)
 
+chunks = 3000
+print(f"Splitting in {chunks} chunks for each language for df_clean...")
 df_clean_chunk: pd.DataFrame = gen_chunk_entries(df_clean, 3000)
+print(f"Splitting in {chunks} chunks for each language for df_dirty...")
 df_dirty_chunk: pd.DataFrame = gen_chunk_entries(df_dirty, 3000)
 
-df_clean_chunk.to_pickle("clean_chunks")
-df_dirty_chunk.to_pickle("dirty_chunks")
+print("Saving chunks for df_clean_chunk ...")
+df_clean_chunk.to_pickle("clean_chunks_no_str")
+print("Saving chunks for df_dirty_chunk ...")
+df_dirty_chunk.to_pickle("dirty_chunks_no_str")

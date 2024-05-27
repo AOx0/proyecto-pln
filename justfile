@@ -12,4 +12,4 @@ uninstall-kernel:
     jupyter kernelspec remove proyecto-pln
 
 streamlit:
-    . {{justfile_directory()}}/.venv/bin/activate && streamlit run streamlit/main.py
+    . {{justfile_directory()}}/.venv/bin/activate && streamlit run streamlit/Project.py

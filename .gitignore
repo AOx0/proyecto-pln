@@ -12,3 +12,6 @@ wheels/
 
 # Rust
 target
+scripts/dirty_chunks_no_str_spacy
+scripts/clean_chunks_no_str_spacy
+scripts/dirty_chunks_no_str_spacy_dirty
